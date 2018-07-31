@@ -125,7 +125,13 @@ public class AnaforaDocumentFormat extends TextualDocumentFormat {
               features.put(property.getName(), property.getTextTrim());
           }
 
-          annotationSet.add(Long.valueOf(span[0]), Long.valueOf(span[1]), type,
+          long end = Long.valueOf(span[1]);
+          if (end > doc.getContent().toString().length()) {
+            end = doc.getContent().toString().length();
+            log.warn("annotation runs over end of document and has been truncated: "+span[1]+ " > " + end);
+          }
+          
+          annotationSet.add(Long.valueOf(span[0]), end, type,
               features);
         }
 
