@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 1995-2018, The University of Sheffield. See the file
+ * COPYRIGHT.txt in the software or at http://gate.ac.uk/gate/COPYRIGHT.txt
+ *
+ * This file is part of GATE (see http://gate.ac.uk/), and is free software,
+ * licenced under the GNU Library General Public License, Version 3, June 2007
+ * (in the distribution as file licence.html, and also available at
+ * http://gate.ac.uk/gate/licence.html).
+ */
+
 package gate.creole.anafora;
 
 import java.io.File;
@@ -126,26 +136,25 @@ public class AnaforaDocumentFormat extends TextualDocumentFormat {
           }
 
           long end = Long.parseLong(span[1]);
-          if (end > doc.getContent().toString().length()) {
+          if(end > doc.getContent().toString().length()) {
             end = doc.getContent().toString().length();
-            log.warn("annotation runs over end of document and has been truncated: "+span[1]+ " > " + end);
+            log.warn(
+                "annotation runs over end of document '"+doc.getName()+"' and has been truncated: "
+                    + span[1] + " > " + end);
           }
-          
-          annotationSet.add(Long.valueOf(span[0]), end, type,
-              features);
+
+          annotationSet.add(Long.valueOf(span[0]), end, type, features);
         }
 
         // TODO process relations using the GATE relations API
 
-      } catch(JDOMException | IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch(NumberFormatException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch(InvalidOffsetException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+      } catch(JDOMException | IOException | NumberFormatException
+          | InvalidOffsetException e) {
+        throw new DocumentFormatException(
+            "A problem occurred reading annotations from "
+                + annotationFile.getName()
+                + ". Some annotations may be missing.",
+            e);
       }
     }
   }
