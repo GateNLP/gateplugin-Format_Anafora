@@ -76,6 +76,8 @@ public class AnaforaCorpusPopulator extends ResourceHelper {
               docTxt.toURI().toURL());
           params.put(Document.DOCUMENT_MIME_TYPE_PARAMETER_NAME,
               "text/x-anafora");
+          
+          //TODO check is it always safe to assume UTF-8 for this format?
           params.put(Document.DOCUMENT_ENCODING_PARAMETER_NAME, "UTF-8");
 
           Document document =
