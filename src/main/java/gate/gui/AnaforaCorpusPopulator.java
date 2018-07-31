@@ -12,6 +12,7 @@ package gate.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import gate.Corpus;
 import gate.Document;
 import gate.Factory;
 import gate.FeatureMap;
+import gate.creole.ResourceInstantiationException;
 import gate.creole.metadata.AutoInstance;
 import gate.creole.metadata.CreoleResource;
 
@@ -76,8 +78,8 @@ public class AnaforaCorpusPopulator extends ResourceHelper {
               docTxt.toURI().toURL());
           params.put(Document.DOCUMENT_MIME_TYPE_PARAMETER_NAME,
               "text/x-anafora");
-          
-          //TODO check is it always safe to assume UTF-8 for this format?
+
+          // TODO check is it always safe to assume UTF-8 for this format?
           params.put(Document.DOCUMENT_ENCODING_PARAMETER_NAME, "UTF-8");
 
           Document document =
@@ -91,7 +93,8 @@ public class AnaforaCorpusPopulator extends ResourceHelper {
             Factory.deleteResource(document);
           }
         }
-      } catch(Exception e) {
+      } catch(RuntimeException | ResourceInstantiationException
+          | MalformedURLException e) {
         log.warn("Failed to correctly load Anafora document '"
             + docDir.getName() + "'", e);
       }
