@@ -8,7 +8,7 @@
  * http://gate.ac.uk/gate/licence.html).
  */
 
-package gate.creole.anafora;
+package gate.corpora;
 
 import java.io.File;
 import java.io.IOException;
