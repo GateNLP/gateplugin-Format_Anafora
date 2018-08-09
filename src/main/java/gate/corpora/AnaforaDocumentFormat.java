@@ -106,7 +106,7 @@ public class AnaforaDocumentFormat extends TextualDocumentFormat {
       System.out.println("need to process " + annotationFile.getName());
 
       AnnotationSet annotationSet = doc.getAnnotations(
-          fileData[fileData.length - 3] + "-" + fileData[fileData.length - 2]);
+          fileData[fileData.length - 3] + "." + fileData[fileData.length - 2]);
 
       try {
         org.jdom.Document annotationDocument = builder.build(annotationFile);
