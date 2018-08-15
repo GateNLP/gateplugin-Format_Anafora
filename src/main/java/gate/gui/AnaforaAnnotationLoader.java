@@ -26,6 +26,7 @@ public class AnaforaAnnotationLoader extends ResourceHelper {
 
   public AnaforaAnnotationLoader() {
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fileChooser.setMultiSelectionEnabled(true);
     fileChooser.addChoosableFileFilter(
         new ExtensionFileFilter("Anafora Annotation File", "xml"));
     fileChooser.setAcceptAllFileFilterUsed(true);
@@ -58,8 +59,9 @@ public class AnaforaAnnotationLoader extends ResourceHelper {
           return;
 
         try {
-          AnaforaDocumentFormat.addAnnotationsToDocument(doc,
-              fileChooser.getSelectedFile());
+          for(File file : fileChooser.getSelectedFiles()) {
+            AnaforaDocumentFormat.addAnnotationsToDocument(doc, file);
+          }
         } catch(DocumentFormatException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
