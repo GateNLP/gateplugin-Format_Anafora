@@ -25,6 +25,7 @@ public class AnaforaSchema {
 
   private Map<String, Entity> entities = new HashMap<String, Entity>();
   
+  @SuppressWarnings("unchecked")
   public AnaforaSchema(URL schemaURL) throws JDOMException, IOException {
     
     SAXBuilder jdomBuilder = new SAXBuilder();
