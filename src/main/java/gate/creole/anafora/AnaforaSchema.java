@@ -13,7 +13,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
 import gate.Annotation;
@@ -22,21 +21,17 @@ import gate.Utils;
 
 public class AnaforaSchema {
   
-  private static XMLOutputter outputter = new XMLOutputter();
+  //private static XMLOutputter outputter = new XMLOutputter();
 
   private Map<String, Entity> entities = new HashMap<String, Entity>();
   
-  private URL schemaURL;
-
   public AnaforaSchema(URL schemaURL) throws JDOMException, IOException {
-    this.schemaURL = schemaURL;
     
     SAXBuilder jdomBuilder = new SAXBuilder();
     Document jdomDocument = jdomBuilder.build(schemaURL);
 
     // select all the entities
     XPath xpathEntity = XPath.newInstance("//entity");
-    XPath xpathProperty = XPath.newInstance("//property");
 
     for(Element entityElement : (List<Element>)xpathEntity
         .selectNodes(jdomDocument)) {

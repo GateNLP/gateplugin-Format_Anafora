@@ -20,6 +20,17 @@ import gate.util.Files;
 @CreoleResource(name = "Anafora Annotation Loader", tool = true, autoinstances = @AutoInstance)
 public class AnaforaAnnotationLoader extends ResourceHelper {
 
+  private static final long serialVersionUID = -3791859865663727392L;
+
+  private JFileChooser fileChooser = new JFileChooser();
+
+  public AnaforaAnnotationLoader() {
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fileChooser.addChoosableFileFilter(
+        new ExtensionFileFilter("Anafora Annotation File", "xml"));
+    fileChooser.setAcceptAllFileFilterUsed(true);
+  }
+
   @Override
   protected List<Action> buildActions(NameBearerHandle handle) {
     List<Action> actions = new ArrayList<Action>();
@@ -32,11 +43,6 @@ public class AnaforaAnnotationLoader extends ResourceHelper {
 
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.addChoosableFileFilter(
-            new ExtensionFileFilter("Anafora Annotation File", "xml"));
-        fileChooser.setAcceptAllFileFilterUsed(true);
 
         Document doc = (Document)handle.getTarget();
 
