@@ -77,7 +77,6 @@ public class AnaforaDocumentFormat extends TextualDocumentFormat {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void unpackMarkup(final Document doc) throws DocumentFormatException {
     super.unpackMarkup(doc);
 
@@ -95,67 +94,72 @@ public class AnaforaDocumentFormat extends TextualDocumentFormat {
 
     File docFolder = txtFile.getParentFile();
 
-    SAXBuilder builder = new SAXBuilder(false);
-
     for(File annotationFile : docFolder
         .listFiles((File file) -> file.getName().endsWith(".xml"))) {
-      String[] fileData = annotationFile.getName().split("\\.");
+      if(!annotationFile.getName().startsWith(txtFile.getName())) continue;
+      addAnnotationsToDocument(doc, annotationFile);
+    }
+  }
 
-      if(!fileData[0].equals(txtFile.getName())) continue;
+  @SuppressWarnings("unchecked")
+  public static void addAnnotationsToDocument(Document doc, File annotationFile)
+      throws DocumentFormatException {
+    String[] fileData = annotationFile.getName().split("\\.");
 
-      System.out.println("need to process " + annotationFile.getName());
+    SAXBuilder builder = new SAXBuilder(false);
 
-      AnnotationSet annotationSet = doc.getAnnotations(
-          fileData[fileData.length - 3] + "." + fileData[fileData.length - 2]);
+    AnnotationSet annotationSet = doc.getAnnotations(
+        fileData[fileData.length - 3] + "." + fileData[fileData.length - 2]);
+    
+    if (!annotationSet.isEmpty()) {
+      annotationSet.clear();
+    }
 
-      try {
-        org.jdom.Document annotationDocument = builder.build(annotationFile);
+    try {
+      org.jdom.Document annotationDocument = builder.build(annotationFile);
 
-        Element root = annotationDocument.getRootElement();
+      Element root = annotationDocument.getRootElement();
 
-        Element annotations = root.getChild("annotations");
+      Element annotations = root.getChild("annotations");
 
-        for(Element entity : (List<Element>)annotations.getChildren("entity")) {
-          String id = entity.getChildTextTrim("id");
-          String[] span = entity.getChildTextTrim("span").split(",");
-          String type = entity.getChildTextTrim("type");
+      for(Element entity : (List<Element>)annotations.getChildren("entity")) {
+        String id = entity.getChildTextTrim("id");
+        String[] span = entity.getChildTextTrim("span").split(",");
+        String type = entity.getChildTextTrim("type");
 
-          if(span.length != 2) {
-            log.warn("skipping annotation with more than two offsets: " + id);
-            continue;
-          }
-
-          FeatureMap features = Factory.newFeatureMap();
-          features.put("id", id);
-
-          for(Element property : (List<Element>)entity.getChild("properties")
-              .getChildren()) {
-            String value = property.getTextTrim();
-            if(!value.isEmpty())
-              features.put(property.getName(), property.getTextTrim());
-          }
-
-          long end = Long.parseLong(span[1]);
-          if(end > doc.getContent().toString().length()) {
-            end = doc.getContent().toString().length();
-            log.warn(
-                "annotation runs over end of document '"+doc.getName()+"' and has been truncated: "
-                    + span[1] + " > " + end);
-          }
-
-          annotationSet.add(Long.valueOf(span[0]), end, type, features);
+        if(span.length != 2) {
+          log.warn("skipping annotation with more than two offsets: " + id);
+          continue;
         }
 
-        // TODO process relations using the GATE relations API
+        FeatureMap features = Factory.newFeatureMap();
+        features.put("id", id);
 
-      } catch(JDOMException | IOException | NumberFormatException
-          | InvalidOffsetException e) {
-        throw new DocumentFormatException(
-            "A problem occurred reading annotations from "
-                + annotationFile.getName()
-                + ". Some annotations may be missing.",
-            e);
+        for(Element property : (List<Element>)entity.getChild("properties")
+            .getChildren()) {
+          String value = property.getTextTrim();
+          if(!value.isEmpty())
+            features.put(property.getName(), property.getTextTrim());
+        }
+
+        long end = Long.parseLong(span[1]);
+        if(end > doc.getContent().toString().length()) {
+          end = doc.getContent().toString().length();
+          log.warn("annotation runs over end of document '" + doc.getName()
+              + "' and has been truncated: " + span[1] + " > " + end);
+        }
+
+        annotationSet.add(Long.valueOf(span[0]), end, type, features);
       }
+
+      // TODO process relations using the GATE relations API
+
+    } catch(JDOMException | IOException | NumberFormatException
+        | InvalidOffsetException e) {
+      throw new DocumentFormatException(
+          "A problem occurred reading annotations from "
+              + annotationFile.getName() + ". Some annotations may be missing.",
+          e);
     }
   }
 }
